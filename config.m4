@@ -7,56 +7,59 @@ PHP_ARG_WITH(logger, Logger support,
                           Defaults to [/usr/local]])
 
 if test "$PHP_LOGGER" != "no"; then
-	PHP_REQUIRE_CXX
+  PHP_REQUIRE_CXX
 
-	dnl ===== define default log4cxx install dir =====
-	if test "$PHP_LOGGER" = "yes"; then
-		LOGGER_DIR="/usr/local"
-	fi
+  dnl ===== define default log4cxx install dir =====
+  LOGGER_BASE_DIR="$PHP_LOGGER"
+  if test "$PHP_LOGGER" = "yes"; then
+    LOGGER_BASE_DIR="/usr/local"
+  fi
 
-	dnl ===== check libs =====
-	AC_MSG_CHECKING([log4cxx library])
+  dnl ===== check libs =====
+  AC_MSG_CHECKING([log4cxx library])
 
-	LOG4CXXLIBDIR="lib"
-	LOG4CXXLIBNAME="liblog4cxx"
 
-	if test -f "$LOGGER_DIR/$LOG4CXXLIBDIR/$LOG4CXXLIBNAME.la" && test -f "$LOGGER_DIR/$LOG4CXXLIBDIR/$LOG4CXXLIBNAME.so"; then
-		LOG4CXX_LIB_DIR="$LOGGER_DIR/$LOG4CXXLIBDIR/"
-	else
-		AC_MSG_ERROR('log4cxx libraries not found in $LOGGER_DIR/$LOG4CXXLIBDIR/')
-	fi
-	AC_MSG_RESULT($LOG4CXX_LIB_DIR)
+  if test -f "$LOGGER_BASE_DIR/lib/liblog4cxx.la" &&
+     test -f "$LOGGER_BASE_DIR/lib/liblog4cxx.so"; then
+    LOG4CXX_LIB_DIR="$LOGGER_BASE_DIR/lib/"
+  else
+    AC_MSG_ERROR('log4cxx libraries not found in $LOGGER_BASE_DIR/lib/')
+  fi
+  AC_MSG_RESULT($LOG4CXX_LIB_DIR)
 
-	dnl ===== check headers =====
-	AC_MSG_CHECKING([log4cxx header files])
+  dnl ===== check headers =====
+  AC_MSG_CHECKING([log4cxx header files])
 
-	INC_DIR="$LOGGER_DIR/include"
-	INC_FILES="$INC_DIR/log4cxx/logger.h $INC_DIR/log4cxx/logmanager.h"
+  LOG4CXX_INC_DIR="$LOGGER_BASE_DIR/include/log4cxx"
+  INC_FILES="$LOG4CXX_INC_DIR/logger.h $LOG4CXX_INC_DIR/logmanager.h"
 
-	for i in $INC_FILES; do
-		if test ! -f $i; then
-			AC_MSG_ERROR('log4cxx headers not found in $INC_DIR')
-		fi
-	done
-	LOG4CXX_INC_DIR="$INC_DIR"
-	AC_MSG_RESULT($LOG4CXX_INC_DIR)
+  for i in $INC_FILES; do
+    if test ! -f $i; then
+      AC_MSG_ERROR('log4cxx headers not found in $LOGGER_INC_DIR')
+    fi
+  done
 
-	dnl ===== add results to environment =====
-	dnl PHP_ADD_LIBRARY_WITH_PATH(log4cxx, $LOG4CXX_LIB_DIR, LOGGER_SHARED_LIBADD)
-	dnl PHP_CHECK_LIBRARY(
-	dnl  log4cxx,
-	dnl  _ZN7log4cxx17BasicConfigurator9configureEv,
-	dnl  [],
-	dnl  [AC_MSG_ERROR(Wrong log4cxx lib version or lib not found)]
-	dnl  [-L$LOG4CXX_LIB_DIR $LOGGER_SHARED_LIBADD]
-	dnl )
+  AC_MSG_RESULT($LOG4CXX_INC_DIR)
 
-	dnl PHP_ADD_LIBPATH($LOG4CXX_LIB_DIR, LOGGER_SHARED_LIBADD)
-	PHP_ADD_LIBRARY_WITH_PATH(log4cxx, "", LOGGER_SHARED_LIBADD)
-	dnl PHP_ADD_LIBRARY(log4cxx, 1, LOGGER_SHARED_LIBADD)
+  dnl ===== add log4cxx lib to compile environment =====
+  PHP_CHECK_LIBRARY(
+    log4cxx,
+    _ZN7log4cxx17BasicConfigurator9configureEv,
+    [
+      AC_DEFINE(HAVE_LIBLOG4CXX,1,[ ])
+    ],
+    [
+      AC_MSG_ERROR([Invalid liblog4cxx, missing log4cxx::BasicConfigurator::configure method.])
+    ],
+    [
+      -L$LOG4CXX_LIB_DIR -llog4cxx
+    ]
+  )
 
-  	PHP_ADD_INCLUDE($LOG4CXX_INC_DIR)
+  AC_DEFINE([HAVE_LOGGER],1 ,[whether you have logger module])
 
-	AC_DEFINE([HAVE_LOGGER],1 ,[whether you have logger module])
-	PHP_NEW_EXTENSION(logger, logger.cc, $ext_shared,,,yes)
+  PHP_ADD_LIBRARY_WITH_PATH(log4cxx, $LOG4CXX_LIB_DIR, LOGGER_SHARED_LIBADD)
+  PHP_ADD_INCLUDE($LOG4CXX_INC_DIR)
+  PHP_SUBST(LOGGER_SHARED_LIBADD)
+  PHP_NEW_EXTENSION(logger, logger.cpp, $ext_shared,,,yes)
 fi
