@@ -43,21 +43,9 @@ PHP_RINIT_FUNCTION(logger);
 PHP_RSHUTDOWN_FUNCTION(logger);
 PHP_MINFO_FUNCTION(logger);
 
-/*
 ZEND_BEGIN_MODULE_GLOBALS(logger)
-	// put user space globals here
+	char *prop_file_name;
 ZEND_END_MODULE_GLOBALS(logger)
-*/
-
-/* In every utility function you add that needs to use variables 
-   in php_logger_globals, call TSRMLS_FETCH(); after declaring other 
-   variables used by that function, or better yet, pass in TSRMLS_CC
-   after the last function argument and declare your utility function
-   with TSRMLS_DC after the last declared argument.  Always refer to
-   the globals in your function as LOGGER_G(variable).  You are 
-   encouraged to rename these macros something shorter, see
-   examples in any other php module directory.
-*/
 
 #ifdef ZTS
 #define LOGGER_G(v) TSRMG(logger_globals_id, zend_logger_globals *, v)
@@ -65,8 +53,7 @@ ZEND_END_MODULE_GLOBALS(logger)
 #define LOGGER_G(v) (logger_globals.v)
 #endif
 
-#endif	/* PHP_LOGGER_H */
-
+#endif
 
 /*
  * Local variables:

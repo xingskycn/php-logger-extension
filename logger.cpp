@@ -23,29 +23,31 @@
 #endif
 
 #include "php.h"
-#include "php_ini.h"
+#include "php_globals.h"
 #include "ext/standard/info.h"
 #include "php_logger.h"
+#include "php_ini.h"
 
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
 
 using namespace log4cxx;
-//using namespace log4cxx::helpers;
 
-// uncomment if using TS globals var
 ZEND_DECLARE_MODULE_GLOBALS(logger)
+static PHP_GINIT_FUNCTION(logger);
 
 /* NTS globals var */
 zend_class_entry *basic_configurator_ce;
+zend_object_handlers basic_configurator_object_handlers;
+
 static int le_logger;
 
 /* {{{ logger_functions[]
  *
- * Every user visible function must have an entry in logger_functions[].
+ * User functions
  */
 zend_function_entry logger_functions[] = {
-	{NULL, NULL, NULL}	/* Must be the last line in logger_functions[] */
+	{NULL, NULL, NULL}
 };
 /* }}} */
 
@@ -65,7 +67,11 @@ zend_module_entry logger_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
 	PHP_LOGGER_VERSION, /* Replace with version number for your extension */
 #endif
-	STANDARD_MODULE_PROPERTIES
+	PHP_MODULE_GLOBALS(logger),
+	PHP_GINIT(logger),
+	NULL,
+	NULL,
+	STANDARD_MODULE_PROPERTIES_EX
 };
 /* }}} */
 
@@ -74,37 +80,37 @@ ZEND_GET_MODULE(logger)
 #endif
 
 
-/* {{{ proto static void configure()
+/* {{{ proto public void __construct */ 
+static PHP_METHOD(LoggerBasicConfigurator, __construct)
+{
+}
+/*  }}} */
+
+/* {{{ proto public static void configure()
    Add a ConsoleAppender that uses Pattern Layout and prints to stdout to the root logger. */
 static PHP_METHOD(LoggerBasicConfigurator, configure)
 {
 	BasicConfigurator::configure();
 }
+/* }}} */
 
 function_entry logger_basic_configurator_methods[] = {
-	PHP_ME(LoggerBasicConfigurator, configure, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerBasicConfigurator, __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+	PHP_ME(LoggerBasicConfigurator, configure  , NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
 
 /* {{{ PHP_INI
  */
-/* Remove comments and fill if you need to have entries in php.ini
 PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("logger.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_logger_globals, logger_globals)
-    STD_PHP_INI_ENTRY("logger.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_logger_globals, logger_globals)
+    STD_PHP_INI_ENTRY("logger.prop_file_name", "", PHP_INI_ALL, OnUpdateString, prop_file_name, zend_logger_globals, logger_globals)
 PHP_INI_END()
-*/
 /* }}} */
 
-/* {{{ php_logger_init_globals
- */
-/* Uncomment this function if you have INI entries
-static void php_logger_init_globals(zend_logger_globals *logger_globals)
+static PHP_GINIT_FUNCTION(logger)
 {
-	logger_globals->global_value = 0;
-	logger_globals->global_string = NULL;
+	LOGGER_G(prop_file_name) = "";
 }
-*/
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
@@ -113,13 +119,17 @@ PHP_MINIT_FUNCTION(logger)
 {
 	zend_class_entry ce;
 
-	/* initialize class LoggerBasicConfigurator */
+	REGISTER_INI_ENTRIES();
+
+	/* initialize class LoggerBasicConfigurator */ 
 	INIT_CLASS_ENTRY(ce, "LoggerBasicConfigurator", logger_basic_configurator_methods);
 	basic_configurator_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	
+	memcpy(&basic_configurator_object_handlers,
+	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 
-	/* If you have INI entries, uncomment these lines 
-	REGISTER_INI_ENTRIES();
-	*/
+	basic_configurator_object_handlers.clone_obj = NULL;
+
 	return SUCCESS;
 }
 /* }}} */
@@ -128,14 +138,11 @@ PHP_MINIT_FUNCTION(logger)
  */
 PHP_MSHUTDOWN_FUNCTION(logger)
 {
-	/* uncomment this line if you have INI entries
 	UNREGISTER_INI_ENTRIES();
-	*/
 	return SUCCESS;
 }
 /* }}} */
 
-/* Remove if there's nothing to do at request start */
 /* {{{ PHP_RINIT_FUNCTION
  */
 PHP_RINIT_FUNCTION(logger)
@@ -144,7 +151,6 @@ PHP_RINIT_FUNCTION(logger)
 }
 /* }}} */
 
-/* Remove if there's nothing to do at request end */
 /* {{{ PHP_RSHUTDOWN_FUNCTION
  */
 PHP_RSHUTDOWN_FUNCTION(logger)
@@ -161,9 +167,7 @@ PHP_MINFO_FUNCTION(logger)
 	php_info_print_table_header(2, "logger support", "enabled");
 	php_info_print_table_end();
 
-	/* Remove comments if you have entries in php.ini
 	DISPLAY_INI_ENTRIES();
-	*/
 }
 /* }}} */
 
