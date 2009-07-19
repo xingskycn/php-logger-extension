@@ -103,13 +103,13 @@ function_entry logger_basic_configurator_methods[] = {
 /* {{{ PHP_INI
  */
 PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("logger.prop_file_name", "", PHP_INI_ALL, OnUpdateString, prop_file_name, zend_logger_globals, logger_globals)
+    STD_PHP_INI_ENTRY("logger.configuration", "log4php.properties", PHP_INI_ALL, OnUpdateString, configuration, zend_logger_globals, logger_globals)
 PHP_INI_END()
 /* }}} */
 
 static PHP_GINIT_FUNCTION(logger)
 {
-	LOGGER_G(prop_file_name) = "";
+	// LOGGER_G(configuration) = "";
 }
 /* }}} */
 
