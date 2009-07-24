@@ -30,6 +30,7 @@
 
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
+#include <log4cxx/propertyconfigurator.h>
 
 using namespace log4cxx;
 
@@ -39,6 +40,9 @@ static PHP_GINIT_FUNCTION(logger);
 /* NTS globals var */
 zend_class_entry *basic_configurator_ce;
 zend_object_handlers basic_configurator_object_handlers;
+
+zend_class_entry *property_configurator_ce;
+zend_object_handlers property_configurator_object_handlers;
 
 static int le_logger;
 
@@ -80,12 +84,6 @@ ZEND_GET_MODULE(logger)
 #endif
 
 
-/* {{{ proto public void __construct */ 
-static PHP_METHOD(LoggerBasicConfigurator, __construct)
-{
-}
-/*  }}} */
-
 /* {{{ proto public static void configure()
    Add a ConsoleAppender that uses Pattern Layout and prints to stdout to the root logger. */
 static PHP_METHOD(LoggerBasicConfigurator, configure)
@@ -95,10 +93,31 @@ static PHP_METHOD(LoggerBasicConfigurator, configure)
 /* }}} */
 
 function_entry logger_basic_configurator_methods[] = {
-	PHP_ME(LoggerBasicConfigurator, __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-	PHP_ME(LoggerBasicConfigurator, configure  , NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerBasicConfigurator, configure, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
+
+/* {{{ proto public static boolean configure(string $file)
+   Read configuration options from $file. */
+static PHP_METHOD(LoggerPropertyConfigurator, configure)
+{
+	char *file;
+	int file_len;
+	
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &file, &file_len)) {
+		RETURN_FALSE;
+	}
+	
+	PropertyConfigurator::configure(file);
+	RETURN_TRUE;
+}
+/* }}} */
+
+function_entry logger_property_configurator_methods[] = {
+	PHP_ME(LoggerPropertyConfigurator, configure, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	{NULL, NULL, NULL}
+};
+
 
 /* {{{ PHP_INI
  */
@@ -124,11 +143,16 @@ PHP_MINIT_FUNCTION(logger)
 	/* initialize class LoggerBasicConfigurator */ 
 	INIT_CLASS_ENTRY(ce, "LoggerBasicConfigurator", logger_basic_configurator_methods);
 	basic_configurator_ce = zend_register_internal_class(&ce TSRMLS_CC);
-	
 	memcpy(&basic_configurator_object_handlers,
 	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-
 	basic_configurator_object_handlers.clone_obj = NULL;
+	
+	/* initialize class LoggerPropertyConfigurator */
+	INIT_CLASS_ENTRY(ce, "LoggerPropertyConfigurator", logger_property_configurator_methods);
+	property_configurator_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	memcpy(&property_configurator_object_handlers,
+	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	property_configurator_object_handlers.clone_obj = NULL;
 
 	return SUCCESS;
 }
