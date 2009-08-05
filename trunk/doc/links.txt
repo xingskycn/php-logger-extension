@@ -20,3 +20,11 @@ http://www.zend.com/php/internals/extension-writing1.php#Heading5
 
 http://www.talkphp.com/vbarticles.php?do=article&articleid=49&title=creating-custom-php-extensions
 (really nice, I'm developing based on this informations)
+
+
+Windows DLL development
+http://msdn.microsoft.com/en-us/library/669zx6zc(VS.71).aspx
+(Configuration of MSVC)
+
+http://support.microsoft.com/kb/815065
+(Introduion do many dll concepts)
