@@ -28,3 +28,8 @@ http://msdn.microsoft.com/en-us/library/669zx6zc(VS.71).aspx
 
 http://support.microsoft.com/kb/815065
 (Introduion do many dll concepts)
+
+Search for 
+  DLL Version Information Editor http://msdn.microsoft.com/en-us/library/6fkzft86(VS.80).aspx
+	Adding rc file with vs 2008 xe http://msdn.microsoft.com/en-us/library/d4cfawwc(VS.80).aspx
+  Creating resource script       http://msdn.microsoft.com/en-us/library/sxdy04be(VS.80).aspx
