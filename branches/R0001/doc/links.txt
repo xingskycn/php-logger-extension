@@ -1,0 +1,35 @@
+After two weeks of searching, this is what I have come up with, overally:
+
+http://www.devarticles.com/c/a/Cplusplus/Developing-Custom-PHP-Extensions-Part-1/
+(Developing extensions using the Microsoft Visual C++ compiler in Windows)
+
+http://www.devnewz.com/2002/0909.html
+(Compiling extensions with Microsoft's Visual C++ 6.0 compiler. )
+
+http://bugs.tutorbuddy.com/phpcpp/phpcpp/
+(focus on UNIX. a few pointers for Windows development. brief and to the point.)
+
+http://kromann.info/article.php?Id=11062862408280000
+(build the Windows version of PHP5, including many of the extensions.)
+
+http://www.php.net/manual/en/install.windows.building.php
+(Official manual for building PHP in win.)
+
+http://www.zend.com/php/internals/extension-writing1.php#Heading5
+(Official PHP's Zend manual for bulding extensions. Windows PHP extensions will be covered in a later article)
+
+http://www.talkphp.com/vbarticles.php?do=article&articleid=49&title=creating-custom-php-extensions
+(really nice, I'm developing based on this informations)
+
+
+Windows DLL development
+http://msdn.microsoft.com/en-us/library/669zx6zc(VS.71).aspx
+(Configuration of MSVC)
+
+http://support.microsoft.com/kb/815065
+(Introduion do many dll concepts)
+
+Search for 
+  DLL Version Information Editor http://msdn.microsoft.com/en-us/library/6fkzft86(VS.80).aspx
+	Adding rc file with vs 2008 xe http://msdn.microsoft.com/en-us/library/d4cfawwc(VS.80).aspx
+  Creating resource script       http://msdn.microsoft.com/en-us/library/sxdy04be(VS.80).aspx
