@@ -199,13 +199,102 @@ static PHP_METHOD(Logger, debug)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	//obj->logger->debug(message);
 	LOG4CXX_DEBUG(obj->logger, message);
+}
+/* }}} */
+
+/* {{{ proto public void getLogger(string $message)
+   Log a message with the DEBUG level. */
+static PHP_METHOD(Logger, trace)
+{
+	char *message;
+	int message_len;
+	zval *object = getThis();
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
+		return;
+	}
+
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LOG4CXX_TRACE(obj->logger, message);
+}
+/* }}} */
+
+/* {{{ proto public void getLogger(string $message)
+   Log a message with the DEBUG level. */
+static PHP_METHOD(Logger, info)
+{
+	char *message;
+	int message_len;
+	zval *object = getThis();
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
+		return;
+	}
+
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LOG4CXX_INFO(obj->logger, message);
+}
+/* }}} */
+
+/* {{{ proto public void getLogger(string $message)
+   Log a message with the DEBUG level. */
+static PHP_METHOD(Logger, warn)
+{
+	char *message;
+	int message_len;
+	zval *object = getThis();
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
+		return;
+	}
+
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LOG4CXX_WARN(obj->logger, message);
+}
+/* }}} */
+
+/* {{{ proto public void getLogger(string $message)
+   Log a message with the DEBUG level. */
+static PHP_METHOD(Logger, error)
+{
+	char *message;
+	int message_len;
+	zval *object = getThis();
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
+		return;
+	}
+
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LOG4CXX_ERROR(obj->logger, message);
+}
+/* }}} */
+
+/* {{{ proto public void getLogger(string $message)
+   Log a message with the DEBUG level. */
+static PHP_METHOD(Logger, fatal)
+{
+	char *message;
+	int message_len;
+	zval *object = getThis();
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
+		return;
+	}
+
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LOG4CXX_FATAL(obj->logger, message);
 }
 /* }}} */
 
 function_entry logger_methods[] = {
 	PHP_ME(Logger, debug, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, trace, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, info , NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, warn , NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, error, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, fatal, NULL, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
 
