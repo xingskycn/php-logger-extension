@@ -15,7 +15,6 @@ Here are some instructions to build the extension from the source files. We have
   cd /tmp
   tar -xzfv php-5.2.10.tar.gz
 }}}
-
   # Checkout and create the logger dir inside the php ext dir
 {{{
   cd /tmp/php-5.2.10/ext
@@ -33,6 +32,7 @@ Here are some instructions to build the extension from the source files. We have
   # If you are starting to use the extension check the examples on how to configure the logger for use.
 
 == Building on Windows Xp ==
-Coming soon.
+We are compiling a how-to to build on windows with visual c 6 and 9.
+Windows pre-compiled zip packages are available for download, anyway if you need to compile from source (e.g. for local changes) then please come back later.
 	
 	
