@@ -32,6 +32,7 @@
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/propertyconfigurator.h>
 #include <log4cxx/logmanager.h>
+#include <log4cxx/helpers/exception.h>
 
 using namespace log4cxx;
 
@@ -185,6 +186,32 @@ zend_object_value logger_create_handler(zend_class_entry *type TSRMLS_DC)
 	return retval;
 }
 
+char *php_logger_decode_level_int(int level) {
+	switch (level) {
+		case Level::FATAL_INT:
+			return "FATAL";
+		break;
+		case Level::ERROR_INT:
+			return "ERROR";
+		break;
+		case Level::WARN_INT:
+			return "WARN";
+		break;
+		case Level::INFO_INT:
+			return "INFO";
+		break;
+		case Level::DEBUG_INT:
+			return "DEBUG";
+		break;
+		case Level::TRACE_INT:
+			return "TRACE";
+		break;
+		default:
+			return NULL;
+		break;
+	}
+}
+
 /* {{{ proto public void getLogger(string $message)
    Log a message with the DEBUG level. */
 static PHP_METHOD(Logger, debug)
@@ -203,7 +230,7 @@ static PHP_METHOD(Logger, debug)
 /* }}} */
 
 /* {{{ proto public void getLogger(string $message)
-   Log a message with the DEBUG level. */
+   Log a message with the TRACE level. */
 static PHP_METHOD(Logger, trace)
 {
 	char *message;
@@ -220,7 +247,7 @@ static PHP_METHOD(Logger, trace)
 /* }}} */
 
 /* {{{ proto public void getLogger(string $message)
-   Log a message with the DEBUG level. */
+   Log a message with the INFO level. */
 static PHP_METHOD(Logger, info)
 {
 	char *message;
@@ -237,7 +264,7 @@ static PHP_METHOD(Logger, info)
 /* }}} */
 
 /* {{{ proto public void getLogger(string $message)
-   Log a message with the DEBUG level. */
+   Log a message with the WARN level. */
 static PHP_METHOD(Logger, warn)
 {
 	char *message;
@@ -254,7 +281,7 @@ static PHP_METHOD(Logger, warn)
 /* }}} */
 
 /* {{{ proto public void getLogger(string $message)
-   Log a message with the DEBUG level. */
+   Log a message with the ERROR level. */
 static PHP_METHOD(Logger, error)
 {
 	char *message;
@@ -271,7 +298,7 @@ static PHP_METHOD(Logger, error)
 /* }}} */
 
 /* {{{ proto public void getLogger(string $message)
-   Log a message with the DEBUG level. */
+   Log a message with the FATAL level. */
 static PHP_METHOD(Logger, fatal)
 {
 	char *message;
@@ -287,6 +314,55 @@ static PHP_METHOD(Logger, fatal)
 }
 /* }}} */
 
+/* {{{ proto public string getLevel()
+   Returns the assigned Level, if any, for this Logger. Return null if no level assigned to logger */
+static PHP_METHOD(Logger, getLevel) {
+	zval *object = getThis();
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LevelPtr level;
+	char *levelstr;
+	
+	level = obj->logger->getLevel();
+	if (!level) {
+		RETURN_NULL();
+	}
+
+	levelstr = php_logger_decode_level_int(level->toInt());
+	if (levelstr) {
+		RETURN_STRING(levelstr, 1);
+	} else {
+		RETURN_NULL();
+	}
+}
+/* }}} */
+
+/* {{{ proto public string getEffectiveLevel()
+   Starting from this logger, search the logger hierarchy for a non-null level and return it. */
+static PHP_METHOD(Logger, getEffectiveLevel) {
+	zval *object = getThis();
+	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
+	LevelPtr level;
+	char *levelstr;
+	
+	try {
+		level = obj->logger->getEffectiveLevel();
+	} catch (helpers::NullPointerException&) {
+		RETURN_NULL();
+	}
+
+	if (!level) {
+		RETURN_NULL();
+	}
+
+	levelstr = php_logger_decode_level_int(level->toInt());
+	if (levelstr) {
+		RETURN_STRING(levelstr, 1);
+	} else {
+		RETURN_NULL();
+	}
+}
+/* }}} */
+
 function_entry logger_methods[] = {
 	PHP_ME(Logger, debug, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Logger, trace, NULL, ZEND_ACC_PUBLIC)
@@ -294,10 +370,10 @@ function_entry logger_methods[] = {
 	PHP_ME(Logger, warn , NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Logger, error, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Logger, fatal, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, getLevel, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, getEffectiveLevel, NULL, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
-
-
 
 /* {{{ PHP_INI
  */
