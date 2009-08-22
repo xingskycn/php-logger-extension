@@ -17,7 +17,9 @@ EOT;
 }
 
 function changeLogLevel($sLevel) {
-	$sDir = dirname(__FILE__).'/';
+	$sDir = dirname(__FILE__). DIRECTORY_SEPARATOR;
+	$sDir = str_replace('\\', '\\\\', $sDir);
+
 	$sPropertyFile = $sDir."log4j.properties";
 	$sLogFile = $sDir."test_logger.log";
 

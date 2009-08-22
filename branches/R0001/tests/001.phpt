@@ -2,7 +2,9 @@
 File Appender - test if the logger is able to append to a file
 --FILE--
 <?php
-$sDir = dirname(__FILE__).'/';
+$sDir = dirname(__FILE__). DIRECTORY_SEPARATOR;
+$sDir = str_replace('\\', '\\\\', $sDir);
+
 $sLogFile = $sDir."test_logger.log";
 $sLogText = 'test test test 12345';
 $sPropertyFile = $sDir."log4j.properties";
@@ -32,6 +34,7 @@ if (strpos($sDebugLine, $sLogText) === false) {
 } else {
 	print "PASS";
 }
+?>
 --EXPECT--
 PASS
 --CLEAN--
