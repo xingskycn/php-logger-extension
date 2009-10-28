@@ -1,4 +1,5 @@
-#Php-logger-extension Quick Reference.
+#summary Quick Reference.
+#labels Featured,Phase-Design
 
 = Introduction =
 Here goes some simple examples on using this extension within applications.
