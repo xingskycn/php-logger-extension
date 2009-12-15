@@ -22,6 +22,7 @@
 #include "config.h"
 #endif
 
+#include "zend_execute.h"
 #include "php.h"
 #include "php_globals.h"
 #include "ext/standard/info.h"
@@ -212,6 +213,31 @@ char *php_logger_decode_level_int(int level) {
 	}
 }
 
+/* Compute Class::method or Function name */
+void php_logger_get_executing_method_name(char **origin TSRMLS_DC) { /* {{{ */
+	char *space = "";
+	char *class_name = NULL;
+	char *function = NULL;
+	int origin_len;
+
+	function = get_active_function_name(TSRMLS_C);
+	class_name = get_active_class_name(&space TSRMLS_CC);
+
+	if (space[0] == '\0' && !function) {
+		*origin = (char *)emalloc(5);
+		memcpy(*origin, "main", 5);
+		return;
+	}
+
+	origin_len = spprintf(origin, 0, "%v%s%v", class_name, space, function);
+	if (!origin_len) {
+		*origin = (char *)emalloc(8);
+		memcpy(*origin, "unknown", 8);
+		return;
+	}
+}
+/* }}} */
+
 /* {{{ proto public void getLogger(string $message)
    Log a message with the DEBUG level. */
 static PHP_METHOD(Logger, debug)
@@ -225,7 +251,23 @@ static PHP_METHOD(Logger, debug)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_DEBUG(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+
+	if (LOG4CXX_UNLIKELY(logger->isDebugEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getDebug(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
@@ -242,7 +284,23 @@ static PHP_METHOD(Logger, trace)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_TRACE(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+
+	if (LOG4CXX_UNLIKELY(logger->isTraceEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getTrace(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
@@ -259,7 +317,23 @@ static PHP_METHOD(Logger, info)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_INFO(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+	
+	if (LOG4CXX_UNLIKELY(logger->isInfoEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getInfo(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
@@ -276,7 +350,23 @@ static PHP_METHOD(Logger, warn)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_WARN(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+	
+	if (LOG4CXX_UNLIKELY(logger->isWarnEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getWarn(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
@@ -293,7 +383,23 @@ static PHP_METHOD(Logger, error)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_ERROR(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+
+	if (LOG4CXX_UNLIKELY(logger->isErrorEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getError(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
@@ -310,7 +416,23 @@ static PHP_METHOD(Logger, fatal)
 	}
 
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
-	LOG4CXX_FATAL(obj->logger, message);
+	LoggerPtr logger = obj->logger;
+
+	if (LOG4CXX_UNLIKELY(logger->isFatalEnabled())) {
+		helpers::MessageBuffer oss_;
+		char *location;
+		php_logger_get_executing_method_name(&location TSRMLS_CC);
+
+		logger->forcedLog(
+			::log4cxx::Level::getFatal(),
+			oss_.str(oss_ << message),
+			spi::LocationInfo(
+				zend_get_executed_filename(TSRMLS_C),
+				location,
+				zend_get_executed_lineno(TSRMLS_C))
+		);
+		efree(location);
+	}
 }
 /* }}} */
 
