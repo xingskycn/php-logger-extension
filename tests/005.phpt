@@ -24,21 +24,24 @@ fclose($f);
 
 LoggerPropertyConfigurator::configure($sPropertyFile);
 
+$iLine = 0;
 function foo() {
 	$logger = LoggerManager::getLogger(__FUNCTION__);
 	global $sLogText;
+	global $iLine;
 	$logger->debug($sLogText);
 	$logger->trace($sLogText);
 	$logger->info($sLogText);
 	$logger->warn($sLogText);
 	$logger->error($sLogText);
 	$logger->fatal($sLogText);
+	$iLine = __LINE__ - 6;
 }
 
 foo();
 
 $aDebugLines = file($sLogFile);
-$iLine = 30;
+
 foreach ($aDebugLines as $sDebugText) {
 	$sExpected = sprintf("foo %s:%2d - test%s", __FILE__, $iLine++, PHP_EOL);
 	$iDiff = strcmp($sExpected, $sDebugText);
@@ -46,8 +49,8 @@ foreach ($aDebugLines as $sDebugText) {
 		print "PASS\n";
 	} else {
 		print "FAIL\n";
-		//print "Expected: ".$sExpected."\n";
-		//print "Found   : ".$sDebugText."\n";
+		print "Expected: ".$sExpected."\n";
+		print "Found   : ".$sDebugText."\n";
 	}
 }
 
