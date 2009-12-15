@@ -30,9 +30,9 @@ $logger->info($sLogText);
 $logger->warn($sLogText);
 $logger->error($sLogText);
 $logger->fatal($sLogText);
+$iLine = __LINE__ -6;
 
 $aDebugLines = file($sLogFile);
-$iLine = 27;
 
 foreach ($aDebugLines as $sDebugText) {
 	$sExpected = sprintf(" %s:%2d - test%s", __FILE__, $iLine++, PHP_EOL);

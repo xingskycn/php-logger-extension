@@ -24,9 +24,12 @@ fclose($f);
 
 LoggerPropertyConfigurator::configure($sPropertyFile);
 
+$iLine = 0;
+
 Class Foo {
 	public function bar() {
 		global $sLogText;
+		global $iLine;
 		$logger = LoggerManager::getLogger(__METHOD__);
 		$logger->debug($sLogText);
 		$logger->trace($sLogText);
@@ -34,6 +37,7 @@ Class Foo {
 		$logger->warn($sLogText);
 		$logger->error($sLogText);
 		$logger->fatal($sLogText);
+		$iLine = __LINE__ - 6;
 	}
 }
 
@@ -41,7 +45,6 @@ $f = new Foo();
 $f->bar(); 
 
 $aDebugLines = file($sLogFile);
-$iLine = 31;
 foreach ($aDebugLines as $sDebugText) {
 	$sExpected = sprintf("Foo::bar %s:%2d - test%s", __FILE__, $iLine++, PHP_EOL);
 	$iDiff = strcmp($sExpected, $sDebugText);
@@ -49,8 +52,10 @@ foreach ($aDebugLines as $sDebugText) {
 		print "PASS\n";
 	} else {
 		print "FAIL\n";
-		//print "Expected: ".bin2hex($sExpected)."\n";
-		//print "Found   : ".bin2hex($sDebugText)."\n";
+		print "Expected (string ".strlen($sExpected).") ".$sExpected."\n";
+		print "Found (string ".strlen($sDebugText).") ".$sDebugText."\n";
+		print "Expected: ".bin2hex($sExpected)."\n";
+		print "Found   : ".bin2hex($sDebugText)."\n";
 	}
 }
 
