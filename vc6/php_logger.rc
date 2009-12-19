@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,0,0,1
- PRODUCTVERSION 0,0,0,1
+ FILEVERSION 0,0,0,3
+ PRODUCTVERSION 0,0,0,3
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,17 +70,17 @@ BEGIN
     BEGIN
         BLOCK "041604b0"
         BEGIN
-            VALUE "Comments", "Log4cxx Abstraction Layer\0"
-            VALUE "CompanyName", "Jarismar C. Silva\0"
+            VALUE "Comments", "Log4cxx Abstraction Layer (R003 DEV)\0"
+            VALUE "CompanyName", "Php-logger-extension group (Jarismar C. Silva, Diego Tremper)\0"
             VALUE "FileDescription", "php_logger\0"
-            VALUE "FileVersion", "0, 0, 0, 1\0"
+            VALUE "FileVersion", "0, 0, 0, 3\0"
             VALUE "InternalName", "php_logger\0"
             VALUE "LegalCopyright", "PHP License\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "php_logger.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "php_logger Log4cxx Abstraction Layer\0"
-            VALUE "ProductVersion", "0, 0, 0, 1\0"
+            VALUE "ProductVersion", "0, 0, 0, 3\0"
             VALUE "SpecialBuild", "\0"
         END
     END

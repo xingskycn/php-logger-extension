@@ -22,6 +22,10 @@
 #include "config.h"
 #endif
 
+#ifdef _WIN32
+	#include <iostream>
+#endif
+
 #include "zend_execute.h"
 #include "php.h"
 #include "php_globals.h"
@@ -187,7 +191,7 @@ zend_object_value logger_create_handler(zend_class_entry *type TSRMLS_DC)
 	return retval;
 }
 
-char *php_logger_decode_level_int(int level) {
+char *php_logger_decode_level_int(int level) { /* {{{ */
 	switch (level) {
 		case Level::FATAL_INT:
 			return "FATAL";
@@ -212,6 +216,7 @@ char *php_logger_decode_level_int(int level) {
 		break;
 	}
 }
+/* }}} */
 
 /* Compute Class::method or Function name */
 void php_logger_get_executing_method_name(char **origin TSRMLS_DC) { /* {{{ */
