@@ -41,8 +41,8 @@ RSC=rc.exe
 # PROP Output_Dir "Debug_TS"
 # PROP Intermediate_Dir "Debug_TS"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /YX /FD /GZ  /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /YX /FD /GZ  /c
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x416 /d "_DEBUG"
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "e:\php-dev\php-5.2.10" /I "e:\php-dev\\php-5.2.10\main" /I "e:\php-dev\php-5.2.10\Zend" /I "e:\php-dev\php-5.2.10\TSRM" /I "e:\php-dev\php-5.2.10\bindlib_w32" /I "e:\php-dev\apache-log4cxx-0.10.0\src\main\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /D ZEND_DEBUG=0 /D "COMPILE_DL_LOGGER" /D ZTS=1 /D "ZEND_WIN32" /D "PHP_WIN32" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\..\..\..\php-5.2.10" /I "..\..\..\..\php-5.2.10\main" /I "..\..\..\..\php-5.2.10\Zend" /I "..\..\..\..\php-5.2.10\TSRM" /I "..\..\..\..\php-5.2.10\bindlib_w32" /I "..\..\..\..\apache-log4cxx-0.10.0\src\main\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PHP_LOGGER_EXPORTS" /D ZEND_DEBUG=0 /D "COMPILE_DL_LOGGER" /D ZTS=1 /D "ZEND_WIN32" /D "PHP_WIN32" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x416 /d "NDEBUG"
@@ -78,7 +78,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib php5ts.lib log4cxx.lib /nologo /dll /machine:I386 /libpath:"c:\php\dev" /libpath:"e:\php-dev\apache-log4cxx-0.10.0\projects\Release"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib php5ts.lib log4cxx.lib /nologo /dll /machine:I386 /libpath:"c:\php\dev" /libpath:"..\..\..\..\apache-log4cxx-0.10.0\projects\Release"
 
 !ENDIF 
 
@@ -91,7 +91,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\logger.cpp
+SOURCE=..\logger.cpp
 # End Source File
 # Begin Source File
 
