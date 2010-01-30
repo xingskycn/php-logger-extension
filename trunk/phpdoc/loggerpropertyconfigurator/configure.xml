@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Revision: 283871 $ -->
+
+<refentry xml:id="loggerpropertyconfigurator.configure"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+ <refnamediv>
+  <refname>LoggerPropertyConfigurator::configure</refname>
+  <refpurpose>Parse log4j.property file</refpurpose>
+ </refnamediv>
+ 
+ <refsect1 role="description">
+  &reftitle.description;
+  <methodsynopsis>
+   <!-- Example: All methods have this -->
+   <type>void</type><methodname>LoggerPropertyConfigurator::configure</methodname>
+   <!-- Example: Required parameter -->
+   <methodparam><type>string</type><parameter>fileName</parameter></methodparam>
+  </methodsynopsis>
+  <para>
+   This function parse and configure the log4cxx library by the properties file pointed by fileName parameter.
+  </para>
+ </refsect1>
+ 
+ <refsect1 role="parameters">
+  &reftitle.parameters;
+  <para>
+   <variablelist>
+    <varlistentry>
+     <term><parameter>fileName</parameter></term>
+     <listitem>
+      <para>
+       A string that points to a valid, readable log4j.properties file.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </para>
+ </refsect1>
+ 
+ <refsect1 role="returnvalues">
+  &reftitle.returnvalues;
+  <para>void</para>
+ </refsect1>
+ 
+ <refsect1 role="errors">
+  &reftitle.errors;
+  <para>
+    Error are reported on the php log file.
+  </para>
+ </refsect1>
+
+<!--
+ <refsect1 role="unicode">
+  &reftitle.unicode;
+  <para>
+   Information specific to unicode, from the PHP 6 changes.
+  </para>
+ </refsect1>
+ 
+ <refsect1 role="changelog">
+  &reftitle.changelog;
+  <para>
+   <informaltable>
+    <tgroup cols="2">
+     <thead>
+      <row>
+       <entry>&Version;</entry>
+       <entry>&Description;</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>Enter the version of change here</entry>
+       <entry>
+        Describe the change
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </informaltable>
+  </para>
+ </refsect1>
+-->
+
+ <refsect1 role="examples">
+  &reftitle.examples;
+  <para>
+   <example>
+    <title><function>configure</function> example</title>
+
+<!--
+    <para>
+      Here is an usage example.
+    </para>
+-->
+
+    <programlisting role="php">
+; Log4j.properties file content
+log4j.rootLogger=DEBUG, AP1
+log4j.appender.AP1=org.apache.log4j.RollingFileAppender
+log4j.appender.AP1.File=/tmp/myapp.log
+log4j.appender.AP1.MaxFileSize=100KB
+log4j.appender.AP1.MaxBackupIndex=5
+log4j.appender.AP1.layout=org.apache.log4j.PatternLayout
+log4j.appender.AP1.layout.ConversionPattern=%p %t %c - %m%n
+    </programlisting>
+
+
+    <programlisting role="php">
+<![CDATA[
+<?php
+LoggerPropertyConfigurator::configure("log4j.properties");
+
+class Foo {
+  
+  public function bar() {
+    $logger = LoggerManager::getLogger(__METHOD__);
+    $logger->debug('entering bar');
+    // ... do something and set the $result var to an integer
+    $logger->debug('leaving bar with result '.$result);
+  }
+}
+
+$foo = new Foo();
+$foo->bar();
+]]>
+    </programlisting>
+    &example.outputs.similar;
+    <screen>
+<![CDATA[
+DEBUG 0xb7a566c0 Foo::Bar - entering bar
+DEBUG 0xb7a566c0 Foo::Bar - leaving bar with result 1
+]]>
+    </screen>
+   </example>
+  </para>
+ </refsect1>
+
+<!--
+ <refsect1 role="notes">
+  &reftitle.notes;
+  <caution>
+   <para>
+    Any notes that don't fit anywhere else should go here.
+    90% of the time, notes, warnings or cautions are better placed in the
+    parameters section. Consider that before using this section!
+   </para>
+  </caution>
+  &note.language-construct;
+  &note.not-bin-safe;
+  &note.registerglobals;
+ </refsect1>
+-->
+ 
+<!--
+ <refsect1 role="seealso">
+  &reftitle.seealso;
+  <para>
+   <simplelist>
+    <member><function>somefunc</function></member>
+    <member><function>another_func</function></member>
+    <member>The something appendix</member>
+   </simplelist>
+  </para>
+ </refsect1>
+-->
+
+</refentry>
+
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:t
+indent-tabs-mode:nil
+sgml-parent-document:nil
+sgml-default-dtd-file:"../../../../manual.ced"
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+vim600: syn=xml fen fdm=syntax fdl=2 si
+vim: et tw=78 syn=sgml
+vi: ts=1 sw=1
+-->
