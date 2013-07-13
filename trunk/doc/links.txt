@@ -27,7 +27,7 @@ http://msdn.microsoft.com/en-us/library/669zx6zc(VS.71).aspx
 (Configuration of MSVC)
 
 http://support.microsoft.com/kb/815065
-(Introduion do many dll concepts)
+(Introdution to many dll concepts)
 
 Search for 
   DLL Version Information Editor http://msdn.microsoft.com/en-us/library/6fkzft86(VS.80).aspx
