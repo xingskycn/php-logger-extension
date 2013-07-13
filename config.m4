@@ -2,8 +2,8 @@ dnl $Id$
 dnl config.m4 for logger extension
 dnl vim:se ts=4 sw=2 et:
 
-PHP_ARG_WITH(logger, Logger support,
-[  --with-logger[=DIR]       DIR is log4cxx install dir (version >= 0.10.0 required).
+PHP_ARG_WITH(logger, for Apache log4cxx support,
+[  --with-logger[=DIR]       DIR is log4cxx install dir (version >= 0.10.0 required)
                           Defaults to [/usr/local]])
 
 if test "$PHP_LOGGER" != "no"; then

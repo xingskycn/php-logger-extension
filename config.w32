@@ -1,14 +1,13 @@
 // $Id$
 // vim:ft=javascript
 
-ARG_ENABLE("logger", "Logger support", "no");
+ARG_ENABLE("logger", "Apache log4cxx support", "no");
 
 if (PHP_LOGGER != "no") {
-	if (CHECK_HEADER_ADD_INCLUDE("logger.h", "CFLAGS_LOGGER", PHP_PHP_BUILD + "..\\apache-log4cxx-0.10.0\\src\\main\\include;" + PHP_LOGGER) &&
-			CHECK_LIB("log4cxx.lib", "logger", PHP_PHP_BUILD + "..\\apache-log4cxx-0.10.0\\projects\\Release;" + PHP_OCI8)
-			) {
+	if (CHECK_LIB("log4cxx.lib;log4cxx.obj", "logger", "\\apache-sdk\\apache-log4cxx-0.10.0\\projects\\Release;" + PHP_LOGGER) &&
+	    CHECK_HEADER_ADD_INCLUDE("log4cxx\\logger.h", "CFLAGS_LOGGER", "\\apache-sdk\\apache-log4cxx-0.10.0\\src\\main\\include;" + PHP_LOGGER)) {
 				EXTENSION("logger", "logger.cpp", PHP_LOGGER_SHARED);
-				AC_DEFINE("HAVE_LOGGER", 1, "Logger support");
+				AC_DEFINE("HAVE_LOGGER", 1, "Apache log4cxx support");
 	} else {
 		WARNING("logger not enabled; libraries and headers not found");
 	}

@@ -17,12 +17,13 @@
 */
 
 /* $Id$ */
-
 #ifndef PHP_LOGGER_H
 #define PHP_LOGGER_H
 
 #define PHP_LOGGER_VERSION "0.10"
 #define PHP_LOGGER_EXTNAME "logger"
+
+BEGIN_EXTERN_C()
 
 extern zend_module_entry logger_module_entry;
 #define phpext_logger_ptr &logger_module_entry
@@ -52,6 +53,8 @@ ZEND_END_MODULE_GLOBALS(logger)
 #else
 #define LOGGER_G(v) (logger_globals.v)
 #endif
+
+END_EXTERN_C()
 
 #endif
 

@@ -1,22 +1,22 @@
 /*
-  +----------------------------------------------------------------------+
-  | PHP Version 5                                                        |
-  +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2007 The PHP Group                                |
-  +----------------------------------------------------------------------+
-  | This source file is subject to version 3.01 of the PHP license,      |
-  | that is bundled with this package in the file LICENSE, and is        |
-  | available through the world-wide-web at the following url:           |
-  | http://www.php.net/license/3_01.txt                                  |
-  | If you did not receive a copy of the PHP license and are unable to   |
-  | obtain it through the world-wide-web, please send a note to          |
-  | license@php.net so we can mail you a copy immediately.               |
-  +----------------------------------------------------------------------+
-  | Author:                                                              |
-  +----------------------------------------------------------------------+
+   +----------------------------------------------------------------------+
+   | PHP Version 5                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) 1997-2013 The PHP Group                                |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Jarismar C. Silva <jarismar@gmail.com>                      |
+   +----------------------------------------------------------------------+
 */
 
-/* $Id: header,v 1.16.2.1.2.1 2007/01/01 19:32:09 iliaa Exp $ */
+/* $Id$ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -76,9 +76,7 @@ zend_function_entry logger_functions[] = {
 /* {{{ logger_module_entry
  */
 zend_module_entry logger_module_entry = {
-#if ZEND_MODULE_API_NO >= 20010901
 	STANDARD_MODULE_HEADER,
-#endif
 	PHP_LOGGER_EXTNAME,
 	logger_functions,
 	PHP_MINIT(logger),
@@ -86,9 +84,7 @@ zend_module_entry logger_module_entry = {
 	PHP_RINIT(logger),
 	PHP_RSHUTDOWN(logger),
 	PHP_MINFO(logger),
-#if ZEND_MODULE_API_NO >= 20010901
 	PHP_LOGGER_VERSION,
-#endif
 	PHP_MODULE_GLOBALS(logger),
 	PHP_GINIT(logger),
 	NULL,
