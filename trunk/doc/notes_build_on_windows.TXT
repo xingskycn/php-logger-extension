@@ -1,0 +1,216 @@
+==> Step 1 - get visual studio 2008
+http://php.net/manual/en/install.windows.building.php
+https://wiki.php.net/internals/windows/stepbystepbuild
+
+Pagina com quais versoes de Visual Studio compilar, nao aponta para os links exatos, muito ruim documentacao
+https://wiki.php.net/internals/windows/compiler
+
+proximo passo :
+
+instalar "Microsoft Visual Studio 2008 Express Edition"
+http://freewareupdate.com/developer-tools/download-microsoft-visual-studio-2008-express-editions
+* A Micro$oft so fornece o VS 2010 ou o VS 2012. Tive que pegar de um site de downloads na internet
+* Esse link me deu um .iso, dai baixei um montador de ISO para windows, para nao ter que queimar um DVD
+* http://www.slysoft.com/en/download.html (Virtual Clone Drive)
+
+instalar "Microsoft Visual Studio 2008 Service Pack 1 (Installer)"
+http://www.microsoft.com/en-us/download/details.aspx?id=10986
+* O SP1 não está disponível para express edition
+* ERROR MESSAGE: A compatible version of Visual Studio 2008 was not detected on the system. This update is designed for only the Microsoft Visual Studio 2008 (ENU) product family, and is not compatible with any Express editions.
+
+==> Step 2 - SDK
+instalar "Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1" um SDK
+http://www.microsoft.com/en-us/download/confirmation.aspx?id=3138
+
+==> Step 3 - download a snapshot
+
+==> Step 4 - create the folder “c:\php-sdk“
+
+==> Step 5 - unpack the binary-tools.zip archive
+* A estruruta tem um diretorio deps, extrai dentro do c:\php-sdk, criando c:\php-sdk\deps, foi um erro
+* Extraia o conteudo da pasta deps diretamente de c:\php-sdk, criando c:\php-sdk\bin por exemplo
+
+
+==> Step 6 - configure the “windows sdk 6.1 shell”
+* Aqui percebi que o SDK instalado não integra com o VS2008 Express Edition, tentei instalar entao o SDK 6.1
+* http://www.microsoft.com/en-us/download/details.aspx?id=11310
+
+* Para iniciar o “windows sdk 6.1 shell”
+* Click Start, point to All Programs, point to Microsoft Windows SDK <version>, and then click SDK Command Prompt or CMD Shell.
+
+
+* Faltaram alguns .bat (env vars e tb build tree)
+* Baixe eles daqui: http://svn.php.net/viewvc/php/php-internals-win/trunk/script/
+
+==> Step 7 - 9 (nao existem)
+
+==> Step 10
+* Diretorio onde devem ser instaladas as libraries necessarias para o projeto
+* C:\php-sdk\php53dev\vc9\x86\deps
+
+==> Step 15
+* Configure error 1: ERROR: bison is required
+* http://bobobobo.wordpress.com/2008/05/27/how-to-compile-php/
+* Baixei flex e bison e instalei em C:\Program Files (x86)\GnuWin32
+* Adicionei C:\Program Files (x86)\GnuWin32\bin no path do sistema
+* Tive que baixar o pacote zip com as dependencias tb
+
+[PHP compilado com sucesso]
+[Sem extensoes]
+
+
+==> organizar um diretorio com todos os .zip necessarios e esse throubleshooting
+c:\php-sdk\install
+
+==> compilar o log4cxx no windows com VC9
+http://logging.apache.org/log4cxx/building/vstudio.html
+
+==> Preparation
+* Baixei apr e apr-util, nas versões indicadas, de http://archive.apache.org/dist/apr/
+* Instrucoes do site
+unzip apr-1.2.11-win32-src.zip
+rename apr-1.2.11 apr
+unzip apr-util-1.2.10-win32-src.zip
+rename apr-util-1.2.10 apr-util
+cd apache-log4cxx-0.10.0
+configure
+configure-aprutil
+
+* Criei uma pasta c:\apache-sdk
+* \apache-sdk\apache-log4cxx-0.10.0
+* \apache-sdk\apr
+* \apache-sdk\apr-util
+
+* 'sed' nao é um comando blablabla
+http://gnuwin32.sourceforge.net/packages/sed.htm
+
+* apr-build errors
+1>multicast.c
+1>.\network_io\unix\multicast.c(137) : error C2079: 'mip' uses undefined struct 'group_source_req'
+1>.\network_io\unix\multicast.c(168) : error C2224: left of '.gsr_interface' must have struct/union type
+* FIXED, isso eh um bug https://issues.apache.org/bugzilla/show_bug.cgi?id=40398
+* https://issues.apache.org/bugzilla/attachment.cgi?id=21320&action=diff
+
+* log4cxx errors
+* 4>C:\Program Files\Microsoft SDKs\Windows\v6.1\include\ws2def.h(91) : warning C4005: 'AF_IPX' : macro redefinition
+* 4>C:\Program Files\Microsoft SDKs\Windows\v6.1\include\winsock.h(460) : see previous definition of 'AF_IPX'
+* http://www.zachburlingame.com/2011/05/resolving-redefinition-errors-betwen-ws2def-h-and-winsock-h/
+* http://cboard.cprogramming.com/windows-programming/133334-conflicting-winsock-h-winsock2-h.html
+* FIXED, tive que adicionar essas linhas em nteventloggerappender.cpp
+
+linha 20:
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+
+
+===> postar o bug da redeclaracao
+- nao encontrei na lista
+- verificar se existe alguma modificacao com o que esta no github
+
+===> baixar e compilar php_logger.dll com VS 2008 C++, VS 9.0
+https://code.google.com/p/php-logger-extension/
+
+===> instalar tortoise svn, fazer checkout do codigo [OK]
+
+===> compilar por linha de comando no windows
+- ajustei o config.w32, usei referencias absolutas para apontar para as pastas do log4cxx (release e include)
+- iniciar o Microsoft Windows SDK 6.1 Shell
+	> setenv /x86 /xp /release
+- mudar para o diretorio do php cd C:\php-sdk\php53dev\vc9\x86\php5.3-201305231030
+- nmake clean
+- buildconf
+- configure --disable-all --enable-cli --enable-logger
+* Error: os apontamentos defaults dentro de config.w32 esperam que o log4cxx.lib esteja dentro da pasta deps do php
+*        tive que ajustar para usar caminhos absolutos
+*        \\apache-sdk\\apache-log4cxx-0.10.0\\projects\\Release
+*        \\apache-sdk\\apache-log4cxx-0.10.0\\src\\main\\include
+
+- nmake
+* Error: ext\logger\logger.cpp(36) : fatal error C1083: Cannot open include file: 'log4cxx/logger.h': No such file or directory
+*       mudei o check include no config.w32 para adicionar o diretorio include e procurar por log4cxx\\logger.h
+* [OK]
+
+* Warnings
+* > logger.cpp
+* > C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\INCLUDE\xlocale(342) : warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+* > \apache-sdk\apache-log4cxx-0.10.0\src\main\include\log4cxx/spi/configurator.h(57) : warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+
+* Error
+* > Creating library Release_TS\php5ts.lib and object Release_TS\php5ts.exp
+* > internal_functions.obj : error LNK2001: unresolved external symbol _logger_module_entry
+* > Release_TS\php5ts.dll : fatal error LNK1120: 1 unresolved externals
+* > NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN\cl.exe"' : return code '0x2'
+* > Stop.
+
+- tentando debugar, rodei "nmake /D" para exibir os arquivos de entrada/saida do nmake
+- mostrou que esta criando o arquivo "Release_TS\ext\logger\logger.obj"
+- procurei pela entrada _logger_module_entry no arquivo
+> dumpbin /SYMBOLS Release_TS\ext\logger\logger.obj > c:\tmp\dumpbin.log
+- encontrei isso
+0C5 00000008 SECT14 notype       External     | ?logger_module_entry@@3U_zend_module_entry@@A (struct _zend_module_entry logger_module_entry)
+- comparei com a declaracao de uma extensao padrao (no caso spl)
+071 00000000 SECT20 notype       External     | _spl_module_entry
+- o problema e que o c++ esta expondo os simbolos usando C++ external convention
+- adicionei um extern "C" no php_logger.h e resolveu
+- procurando por "extern "C"" em outras extensoes descrobri que existe uma macro BEGIN_EXTERN_C()/END_EXTERN_C()
+
+* Error
+- Nao gerou php5apache2_2.dll
+- Nao encontra o httpd.h
+*> WARNING: Could not find apache2.2 libraries/headers
+- Estava faltando apontar para o diretorio correto do build, adicionei "--with-php-build=c:\php-sdk" no configure
+- configure --disable-all --with-php-build=c:\php-sdk --enable-cli --enable-apache2-2handler --enable-logger
+
+* Error
+- apache nao carrega
+- nao estava encontrando a log4cxx.dll
+- adicionei o diretorio de build a lib no php
+- C:\apache-sdk\apache-log4cxx-0.10.0\projects\Release
+
+====== proximos passos ===
+- testar [OK]
+	* apontei para o arquivo errado e nao deu nenhum erro
+- capturar erros do log4cxx e transformar em erros do php
+	* a lib escreve direto no stderr, nao tem como capturar essas strings de forma segura
+	* a melhor solucao parece ser modificar a lib para armazenar em um buffer as ultimas
+	* mensagens de erro e depois ler da extensao a cada operacao
+	* Nao eh necessario um buffer, o tipo LogString eh um std::basic_string, tem suporte a append
+	* Adicionei o attributo lastMessae em SystemErrWriter
+	* Adicionei os metodos (private storeLastMessage, public hasError e public getLastError)
+
+  * Erro
+  * LNK2001 - unresolved external "private: static std::basic_string log4cxx::SystemErrWritet"
+  * Falatava a declaracao do membro statico lastMessage em SystemErrWrite.cpp
+  * Adicionei a seguinte linha em SystemErrWriter.cpp e o problema foi resolvido
+  * LogString SystemErrWriter::lastMessage;
+
+- Chamar os metodos de log4cxx::SystemErrWriter e converter em erros do PHP
+	* adicionei o metodo, primeiro apareceu NULL, dai percebi que o ponteiro char * retornado era perdido
+	* ao chamar lastString.clear dentro do metodo SystemErrWriter::getLastMessage
+
+	* Mudei para nao liberar entao apareceu apenas um caractere "l" (um L minusculo)
+	* entao percebi que era relacionado a esse warning
+	* > cannot convert parameter 2 from 'const wchar_t *' to 'const char *'
+	* log4cxx esta usando wchar_t, que usa dois bytes por char para suportar Unicode
+	* com isso o segundo byte de char * eh zero, o que eh entendido como fim de string
+
+	* -- nao resolvido, vou ter que pegar o array de wchar_t e converter para char simples.
+	* -- ou pesquisar como compilar a lib com char
+	* -- o ideal eh acumular as mensagens de erro na lib como na primeira implementacao, RESOLVER o MEMORY LEAK, e nao perder informacao
+
+	* resolvido, chamei a funcao Transcoder::encodeUTF8 que converte LogMessage para std::string
+	* com isso, criei um ponteiro char* statico para copiar e retornar um ponteiro para a
+	* mensagem, isso vai gerar um pequeno memory leak ate que a funcao seja chamada novamente
+
+- rodar os testes unitarios no windows
+
+- mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
+
+- adicionar suporte para configurar uma unica vez no MINIT atraves do logger.properties no php.ini
+
+- gerar documentacao decente sobre como compilar no windows
+
+- commitar as mudancas
+- compilar como shared extension
+- criar repositorio no git hub, manter os dois repositorios google code e git atualizados
