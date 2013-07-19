@@ -13,6 +13,7 @@
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
   | Author: Jarismar C. Silva <jarismar.php@gmail.com>                   |
+  |          Diego Tremper <diegotremper@gmail.com>                      |
   +----------------------------------------------------------------------+
 */
 

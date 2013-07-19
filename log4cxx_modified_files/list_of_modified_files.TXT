@@ -1,0 +1,2 @@
+main/cpp/systemerrwriter.cpp - added support for reading error messages from log4cxx lib (jaris 2013/jul/19)
+main/include/log4cxx/helpers/systemerrwriter.h - added support for reading error messages from log4cxx lib (jaris 2013/jul/19)

@@ -13,6 +13,7 @@
    | license@php.net so we can mail you a copy immediately.               |
    +----------------------------------------------------------------------+
    | Authors: Jarismar C. Silva <jarismar@gmail.com>                      |
+   |          Diego Tremper <diegotremper@gmail.com>                      |
    +----------------------------------------------------------------------+
 */
 
@@ -38,8 +39,10 @@
 #include <log4cxx/propertyconfigurator.h>
 #include <log4cxx/logmanager.h>
 #include <log4cxx/helpers/exception.h>
+#include <log4cxx/helpers/systemerrwriter.h>
 
 using namespace log4cxx;
+using namespace log4cxx::helpers;
 
 ZEND_DECLARE_MODULE_GLOBALS(logger)
 static PHP_GINIT_FUNCTION(logger);
@@ -123,6 +126,12 @@ static PHP_METHOD(LoggerPropertyConfigurator, configure)
 	}
 	
 	PropertyConfigurator::configure(file);
+
+	if (SystemErrWriter::hasMessage()) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+		RETURN_FALSE;
+	}
+
 	RETURN_TRUE;
 }
 /* }}} */
