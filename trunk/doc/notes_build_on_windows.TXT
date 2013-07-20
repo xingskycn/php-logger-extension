@@ -204,10 +204,14 @@ https://code.google.com/p/php-logger-extension/
 	* mensagem, isso vai gerar um pequeno memory leak ate que a funcao seja chamada novamente
 
 - rodar os testes unitarios no windows
+- adicionar suporte para Logger::getLogger
+- adicionar suporte para MDC, rodar um teste usando MDC no .properties
 
 - mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
 
 - adicionar suporte para configurar uma unica vez no MINIT atraves do logger.properties no php.ini
+
+- adicionar suporte para configurar com XML, e tambem para configurar com XML via php.ini
 
 - gerar documentacao decente sobre como compilar no windows
 
