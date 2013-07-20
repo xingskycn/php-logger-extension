@@ -145,6 +145,9 @@ function_entry logger_property_configurator_methods[] = {
    Returns the specific logger. */
 static PHP_METHOD(LoggerManager, getLogger)
 {
+	/* Note: any modification you do here, should also be applied to Logger::getLogger
+	 *       I'll look for a way to reference the same method and remove these two copies */
+
 	char *name;
 	int name_len;
 
@@ -447,7 +450,7 @@ static PHP_METHOD(Logger, fatal)
 /* }}} */
 
 /* {{{ proto public string getLevel()
-   Returns the assigned Level, if any, for this Logger. Return null if no level assigned to logger */
+   Returns the assigned Level, if any, for this Logger. Return null if no level was assigned to this logger */
 static PHP_METHOD(Logger, getLevel) {
 	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
@@ -467,6 +470,28 @@ static PHP_METHOD(Logger, getLevel) {
 	}
 }
 /* }}} */
+
+/* {{{ proto public static Logger getLogger(string $message)
+   Alias to LoggerManager::getLogger. */
+static PHP_METHOD(Logger, getLogger)
+{
+	/* FIXME: this method is an alias for LoggerManager::getLogger, verify how to
+	 * point to it and remove this copy-pasted version */
+	char *name;
+	int name_len;
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len)) {
+		RETURN_FALSE;
+	}
+
+	/* create an instance of Logger */
+	object_init_ex(return_value, logger_ce);
+	logger_object *obj = (logger_object *)zend_object_store_get_object(return_value TSRMLS_CC);
+	obj->logger = LogManager::getLogger(name);
+}
+/* }}} */
+
+
 
 /* {{{ proto public string getEffectiveLevel()
    Starting from this logger, search the logger hierarchy for a non-null level and return it. */
@@ -503,6 +528,7 @@ function_entry logger_methods[] = {
 	PHP_ME(Logger, error, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Logger, fatal, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Logger, getLevel, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, getLogger, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Logger, getEffectiveLevel, NULL, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };

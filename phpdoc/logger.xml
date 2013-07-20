@@ -15,7 +15,8 @@
   <section xml:id="logger.intro">
    &reftitle.intro;
    <para>
-    This class does the log.
+    This is the central class in the logger package. Most logging
+    operations, except configuration, are done through this class.
    </para>
   </section>
 <!-- }}} -->
