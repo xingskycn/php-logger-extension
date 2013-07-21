@@ -30,6 +30,7 @@
  &reference.logger.loggerpropertyconfigurator;
  &reference.logger.loggermanager;
  &reference.logger.logger;
+ &reference.logger.loggermdc;
 
 </book>
 

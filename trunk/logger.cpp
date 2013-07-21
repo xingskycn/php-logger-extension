@@ -64,6 +64,8 @@ struct logger_object {
 	LoggerPtr logger;
 };
 
+static zend_class_entry *logger_mdc_ce;
+static zend_object_handlers logger_mdc_object_handlers;
 
 static int le_logger;
 
@@ -533,6 +535,75 @@ function_entry logger_methods[] = {
 	{NULL, NULL, NULL}
 };
 
+/* {{{ proto public static void put(string $key, string $value)
+   Put a context value as identified with the key parameter into the current context map. */
+static PHP_METHOD(LoggerMDC, put) {
+	char *key, *value;
+	int key_len, value_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &key, &key_len, &value, &value_len) == FAILURE)	{
+		return;
+	}
+
+	MDC::remove(key); // need to call remove because MDC does not support updating the value
+
+	if (SystemErrWriter::hasMessage()) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+		return;
+	}
+
+	MDC::put(key, value);
+}
+/* }}} */
+
+/* {{{ proto public static string remove(string $key)
+   Remove the context identified by the key parameter. */
+static PHP_METHOD(LoggerMDC, remove) {
+	char *key;
+	int key_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &key_len) == FAILURE)	{
+		return;
+	}
+
+	std::string value = MDC::remove(key);
+
+	if (SystemErrWriter::hasMessage()) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+		RETURN_FALSE;
+	}
+
+	RETURN_STRING(value.c_str(), 1);
+}
+/* }}} */
+
+/* {{{ proto public static string get(string $key)
+   Get the context identified by the key parameter. */
+static PHP_METHOD(LoggerMDC, get) {
+	char *key;
+	int key_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &key, &key_len) == FAILURE)	{
+		return;
+	}
+
+	std::string value = MDC::get(key);
+
+	if (SystemErrWriter::hasMessage()) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+		RETURN_FALSE;
+	}
+
+	RETURN_STRING(value.c_str(), 1);
+}
+
+function_entry logger_mdc_methods[] = {
+	PHP_ME(LoggerMDC, put, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerMDC, get, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerMDC, remove, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	{NULL, NULL, NULL}
+};
+
 /* {{{ PHP_INI
  */
 PHP_INI_BEGIN()
@@ -582,6 +653,13 @@ PHP_MINIT_FUNCTION(logger)
 	memcpy(&logger_object_handlers,
 	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	logger_object_handlers.clone_obj = NULL;
+
+	/* initialize class LoggerMDC */
+	INIT_CLASS_ENTRY(ce, "LoggerMDC", logger_mdc_methods);
+	logger_mdc_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	memcpy(&logger_mdc_object_handlers,
+	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	logger_mdc_object_handlers.clone_obj = NULL;
 
 	return SUCCESS;
 }

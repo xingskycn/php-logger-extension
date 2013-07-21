@@ -203,9 +203,17 @@ https://code.google.com/p/php-logger-extension/
 	* com isso, criei um ponteiro char* statico para copiar e retornar um ponteiro para a
 	* mensagem, isso vai gerar um pequeno memory leak ate que a funcao seja chamada novamente
 
+- adicionar suporte para Logger::getLogger [OK]
+- adicionar suporte para MDC, rodar um teste usando MDC no .properties [OK]
+	* LoggerMDC::put
+	* log4cxx::mdc parece nao fazer nada quando chamando pela segunda vez
+	* por exemplo mdc::put('key', '1') seguido de mdc::put('key', '2'), no log aparecera sempre KEY=1,
+	* verificar se existe alguma documentacao sobre isso
+
+- verificar o pool de msg errors em nos metodos pertinentes
 - rodar os testes unitarios no windows
-- adicionar suporte para Logger::getLogger
-- adicionar suporte para MDC, rodar um teste usando MDC no .properties
+
+- compilar como shared extension e publicar nova versao
 
 - mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
 
@@ -215,6 +223,6 @@ https://code.google.com/p/php-logger-extension/
 
 - gerar documentacao decente sobre como compilar no windows
 
-- commitar as mudancas
-- compilar como shared extension
 - criar repositorio no git hub, manter os dois repositorios google code e git atualizados
+
+- adicionar constantes para os niveis do log, por exemplo, Logger::DEBUG
