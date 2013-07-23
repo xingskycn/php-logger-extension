@@ -1,0 +1,9 @@
+&reference.logger.logger.debug;
+&reference.logger.logger.error;
+&reference.logger.logger.fatal;
+&reference.logger.logger.info;
+&reference.logger.logger.trace;
+&reference.logger.logger.warn;
+&reference.logger.logger.getlevel;
+&reference.logger.logger.geteffectivelevel;
+&reference.logger.logger.getlogger;
