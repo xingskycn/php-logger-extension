@@ -81,7 +81,9 @@ zend_function_entry logger_functions[] = {
 /* {{{ logger_module_entry
  */
 zend_module_entry logger_module_entry = {
-	STANDARD_MODULE_HEADER,
+	STANDARD_MODULE_HEADER_EX,
+	NULL,
+	NULL,
 	PHP_LOGGER_EXTNAME,
 	logger_functions,
 	PHP_MINIT(logger),
@@ -102,6 +104,10 @@ zend_module_entry logger_module_entry = {
 ZEND_GET_MODULE(logger)
 #endif
 
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO(arginfo_logger__void, 0)
+ZEND_END_ARG_INFO()
+/* }}} */
 
 /* {{{ proto public static void configure()
    Add a ConsoleAppender that uses Pattern Layout and prints to stdout to the root logger. */
@@ -111,10 +117,16 @@ static PHP_METHOD(LoggerBasicConfigurator, configure)
 }
 /* }}} */
 
-function_entry logger_basic_configurator_methods[] = {
-	PHP_ME(LoggerBasicConfigurator, configure, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+const zend_function_entry logger_basic_configurator_methods[] = {
+	PHP_ME(LoggerBasicConfigurator, configure, arginfo_logger__void, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_loggerpropertyconfigurator_configure, 0, 0, 1)
+	ZEND_ARG_INFO(0, file)
+ZEND_END_ARG_INFO()
+/* }}} */
 
 /* {{{ proto public static boolean configure(string $file)
    Read configuration options from $file. */
@@ -138,10 +150,17 @@ static PHP_METHOD(LoggerPropertyConfigurator, configure)
 }
 /* }}} */
 
-function_entry logger_property_configurator_methods[] = {
-	PHP_ME(LoggerPropertyConfigurator, configure, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+const zend_function_entry logger_property_configurator_methods[] = {
+	PHP_ME(LoggerPropertyConfigurator, configure, arginfo_loggerpropertyconfigurator_configure, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_loggermanager_getlogger, 0, 0, 1)
+	ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+/* }}} */
+
 
 /* {{{ proto public static Logger getLogger(string $name)
    Returns the specific logger. */
@@ -164,40 +183,35 @@ static PHP_METHOD(LoggerManager, getLogger)
 }
 /* }}} */
 
-function_entry logger_manager_methods[] = {
-	PHP_ME(LoggerManager, getLogger, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+const zend_function_entry logger_manager_methods[] = {
+	PHP_ME(LoggerManager, getLogger, arginfo_loggermanager_getlogger, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
 
 void logger_free_storage(void *object TSRMLS_DC)
 {
 	logger_object *obj = (logger_object *)object;
-	// delete obj->logger; not needed because obj->logger is statically handled by log4cxx
-	
-	zend_hash_destroy(obj->std.properties);
-	FREE_HASHTABLE(obj->std.properties);
-	
+	zend_object_std_dtor(&obj->std TSRMLS_CC);
 	efree(obj);
 }
 
-zend_object_value logger_create_handler(zend_class_entry *type TSRMLS_DC)
+zend_object_value logger_logger_new(zend_class_entry *ce TSRMLS_DC)
 {
-	zval *tmp;
 	zend_object_value retval;
-	
+
 	logger_object *obj = (logger_object *)emalloc(sizeof(logger_object));
 	memset(obj, 0, sizeof(logger_object));
-	obj->std.ce = type;
-	
-	ALLOC_HASHTABLE(obj->std.properties);
-	zend_hash_init(obj->std.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
-	zend_hash_copy(obj->std.properties, &type->default_properties, 
-			(copy_ctor_func_t)zval_add_ref, (void *)&tmp, sizeof(zval *));
-	
-	retval.handle = zend_objects_store_put(obj, NULL,
-			logger_free_storage, NULL TSRMLS_CC);
+	zend_object_std_init(&obj->std, ce TSRMLS_CC);
+	object_properties_init(&obj->std, ce);
+
+	retval.handle = zend_objects_store_put(
+		obj,
+		NULL,
+		logger_free_storage,
+		NULL TSRMLS_CC
+	);
 	retval.handlers = &logger_object_handlers;
-	
+
 	return retval;
 }
 
@@ -228,11 +242,11 @@ char *php_logger_decode_level_int(int level) { /* {{{ */
 }
 /* }}} */
 
-/* Compute Class::method or Function name */
+/* Compute namespace::Class::method, Class::method or Function name */
 void php_logger_get_executing_method_name(char **origin TSRMLS_DC) { /* {{{ */
-	char *space = "";
-	char *class_name = NULL;
-	char *function = NULL;
+	const char *space = "";
+	const char *class_name = NULL;
+	const char *function = NULL;
 	int origin_len;
 
 	function = get_active_function_name(TSRMLS_C);
@@ -252,6 +266,37 @@ void php_logger_get_executing_method_name(char **origin TSRMLS_DC) { /* {{{ */
 	}
 }
 /* }}} */
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_trace, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_debug, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_info, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_warn, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_error, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_fatal, 0, 0, 1)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_logger_getlogger, 0, 0, 1)
+	ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+/* }}} */
+
 
 /* {{{ proto public void getLogger(string $message)
    Log a message with the DEBUG level. */
@@ -522,18 +567,34 @@ static PHP_METHOD(Logger, getEffectiveLevel) {
 }
 /* }}} */
 
-function_entry logger_methods[] = {
-	PHP_ME(Logger, debug, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, trace, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, info , NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, warn , NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, error, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, fatal, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, getLevel, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Logger, getLogger, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Logger, getEffectiveLevel, NULL, ZEND_ACC_PUBLIC)
+const zend_function_entry logger_methods[] = {
+	PHP_ME(Logger, debug, arginfo_logger_debug, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, trace, arginfo_logger_trace, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, info , arginfo_logger_info, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, warn , arginfo_logger_warn, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, error, arginfo_logger_error, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, fatal, arginfo_logger_fatal, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, getLevel, arginfo_logger__void, ZEND_ACC_PUBLIC)
+	PHP_ME(Logger, getLogger, arginfo_logger_getlogger, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Logger, getEffectiveLevel, arginfo_logger__void, ZEND_ACC_PUBLIC)
 	{NULL, NULL, NULL}
 };
+
+
+/* {{{ arginfo */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_loggermdc_put, 0, 0, 2)
+	ZEND_ARG_INFO(0, key)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_loggermdc_get, 0, 0, 1)
+	ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_loggermdc_remove, 0, 0, 1)
+	ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+/* }}} */
 
 /* {{{ proto public static void put(string $key, string $value)
    Put a context value as identified with the key parameter into the current context map. */
@@ -545,14 +606,20 @@ static PHP_METHOD(LoggerMDC, put) {
 		return;
 	}
 
-	MDC::remove(key); // need to call remove because MDC does not support updating the value
+	std::string keyString;
+	keyString.append(key);
+
+	MDC::remove(keyString); // need to call remove because MDC does not support updating the value
 
 	if (SystemErrWriter::hasMessage()) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
 		return;
 	}
 
-	MDC::put(key, value);
+	std::string valueString;
+	valueString.append(value);
+
+	MDC::put(keyString, valueString);
 }
 /* }}} */
 
@@ -597,10 +664,10 @@ static PHP_METHOD(LoggerMDC, get) {
 	RETURN_STRING(value.c_str(), 1);
 }
 
-function_entry logger_mdc_methods[] = {
-	PHP_ME(LoggerMDC, put, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(LoggerMDC, get, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(LoggerMDC, remove, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+const zend_function_entry logger_mdc_methods[] = {
+	PHP_ME(LoggerMDC, put, arginfo_loggermdc_put, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerMDC, get, arginfo_loggermdc_get, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(LoggerMDC, remove, arginfo_loggermdc_remove, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };
 
@@ -649,7 +716,7 @@ PHP_MINIT_FUNCTION(logger)
 	/* initialize class Logger */
 	INIT_CLASS_ENTRY(ce, "Logger", logger_methods);
 	logger_ce = zend_register_internal_class(&ce TSRMLS_CC);
-	logger_ce->create_object = logger_create_handler;
+	logger_ce->create_object = logger_logger_new;
 	memcpy(&logger_object_handlers,
 	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	logger_object_handlers.clone_obj = NULL;
