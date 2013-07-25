@@ -213,11 +213,36 @@ https://code.google.com/p/php-logger-extension/
 - verificar o pool de msg errors em nos metodos pertinentes
 - rodar os testes unitarios no windows
 
-- compilar como shared extension e publicar nova versao
+- [OK] compilar como shared extension no windows e no linux e publicar nova versao
+	* alterei o config.w32 da extensao para aceitar shared e receber o diretorio do log4cxx como argumento
+	* novo exemplo de configure
+> configure --disable-all --with-php-build=c:\php-sdk --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
+	* gerou um arquivo php_logger.dll na pasta principal (deveria ser em ext?)
+	* move na mao php_logger.dll para a pasta ext e nao rolou
+	* deu erro PHP Startup: Invalid library (maybe not a PHP library) php_logger.dll
+	* rodei um novo build desde o inicio e resolveu, eu tinha rodado buildconf, seguido de nmake, mas era necessario um nmake clean antes de tudo
 
-- mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
+- [OK] mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
 
 - adicionar suporte para configurar uma unica vez no MINIT atraves do logger.properties no php.ini
+
+- [OK] compilar no windows com o php 5.3
+- compilar no linux com o php 5.3
+
+- compilar no windows com o php 5.4
+	* Download 5.4 dep back  http://windows.php.net/downloads/php-sdk/
+> setenv /x86 /xp /release
+> c:\php-sdk-54\bin\phpsdk_setvars.bat
+> cd C:\php-sdk-54\phpdev\vc9\x86\php-5.4.17
+> configure --disable-all --enable-debug --with-php-build=c:\php-sdk-54 --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
+
+	 * Error
+	 * Unhandled exception at 0x7746c41f in httpd.exe: Microsoft C++ exception: std::length_error at memory location 0x0276f184..
+	 * Compilei com suporte a debug --enable-debug
+	 * at MDC::remove(key) logger.cpp ln 614 (LoggerMDC::put)
+	 * apos varias tentativas de entender o problema, reinicie o note e o problema nao ocorreu, parece ser um erro do windows no load de alguma dll
+
+- compilar no linux com o php 5.4
 
 - adicionar suporte para configurar com XML, e tambem para configurar com XML via php.ini
 
@@ -226,3 +251,6 @@ https://code.google.com/p/php-logger-extension/
 - criar repositorio no git hub, manter os dois repositorios google code e git atualizados
 
 - adicionar constantes para os niveis do log, por exemplo, Logger::DEBUG
+
+- rodar um teste de carga no linux com o apache usando mpm_fork, verificar se o logger gera io contention
+- verificar se eh possivel usar assynchronous  logging with mpm_fork
