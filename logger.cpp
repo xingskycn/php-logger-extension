@@ -104,6 +104,17 @@ zend_module_entry logger_module_entry = {
 ZEND_GET_MODULE(logger)
 #endif
 
+bool php_logger_load_properties(char *file) { /* {{{ */
+	PropertyConfigurator::configure(file);
+
+	if (SystemErrWriter::hasMessage()) {
+		return false;
+	}
+
+	return true;
+}
+/* }}} */
+
 /* {{{ arginfo */
 ZEND_BEGIN_ARG_INFO(arginfo_logger__void, 0)
 ZEND_END_ARG_INFO()
@@ -138,15 +149,13 @@ static PHP_METHOD(LoggerPropertyConfigurator, configure)
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &file, &file_len)) {
 		RETURN_FALSE;
 	}
-	
-	PropertyConfigurator::configure(file);
 
-	if (SystemErrWriter::hasMessage()) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
-		RETURN_FALSE;
+	if(php_logger_load_properties(file)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_TRUE;
+	php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+	RETURN_FALSE;
 }
 /* }}} */
 
@@ -304,12 +313,12 @@ static PHP_METHOD(Logger, debug)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 
@@ -337,12 +346,12 @@ static PHP_METHOD(Logger, trace)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 
@@ -370,12 +379,12 @@ static PHP_METHOD(Logger, info)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 	
@@ -403,12 +412,12 @@ static PHP_METHOD(Logger, warn)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 	
@@ -436,12 +445,12 @@ static PHP_METHOD(Logger, error)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 
@@ -469,12 +478,12 @@ static PHP_METHOD(Logger, fatal)
 {
 	char *message;
 	int message_len;
-	zval *object = getThis();
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &message, &message_len)) {
 		return;
 	}
 
+	zval *object = getThis();
 	logger_object *obj = (logger_object *)zend_object_store_get_object(object TSRMLS_CC);
 	LoggerPtr logger = obj->logger;
 
@@ -606,20 +615,14 @@ static PHP_METHOD(LoggerMDC, put) {
 		return;
 	}
 
-	std::string keyString;
-	keyString.append(key);
-
-	MDC::remove(keyString); // need to call remove because MDC does not support updating the value
+	MDC::remove(key); // need to call remove because MDC does not support updating the value
 
 	if (SystemErrWriter::hasMessage()) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
 		return;
 	}
 
-	std::string valueString;
-	valueString.append(value);
-
-	MDC::put(keyString, valueString);
+	MDC::put(key, value);
 }
 /* }}} */
 
@@ -674,13 +677,12 @@ const zend_function_entry logger_mdc_methods[] = {
 /* {{{ PHP_INI
  */
 PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("logger.configuration", "log4php.properties", PHP_INI_ALL, OnUpdateString, configuration, zend_logger_globals, logger_globals)
+    STD_PHP_INI_ENTRY("logger.properties", "", PHP_INI_ALL, OnUpdateString, logger_ini_properties, zend_logger_globals, logger_globals)
 PHP_INI_END()
 /* }}} */
 
 static PHP_GINIT_FUNCTION(logger)
 {
-	// LOGGER_G(configuration) = "";
 }
 /* }}} */
 
@@ -727,6 +729,15 @@ PHP_MINIT_FUNCTION(logger)
 	memcpy(&logger_mdc_object_handlers,
 	        zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	logger_mdc_object_handlers.clone_obj = NULL;
+
+	/* verify if logger.properties was set on ini file, then try to load the file */
+	char *file = LOGGER_G(logger_ini_properties);
+	if (strlen(file) > 0) {
+		bool ok = php_logger_load_properties(file);
+		if (!ok) {
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, SystemErrWriter::getMessage());
+		}
+	}
 
 	return SUCCESS;
 }

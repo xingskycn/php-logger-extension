@@ -46,7 +46,7 @@ PHP_RSHUTDOWN_FUNCTION(logger);
 PHP_MINFO_FUNCTION(logger);
 
 ZEND_BEGIN_MODULE_GLOBALS(logger)
-	char *configuration;
+	char *logger_ini_properties;
 ZEND_END_MODULE_GLOBALS(logger)
 
 #ifdef ZTS
