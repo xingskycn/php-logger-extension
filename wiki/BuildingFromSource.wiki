@@ -9,6 +9,7 @@ Here are some instructions to build the extension from the source files. We have
   # The logger has the same pre-requisites as php to compile. e.g. you will need an update gcc on linux and the msvc6 on windows.
 
 == Building on Linux ==
+  # Before building log4cxx you will need to download the modified versions of some log4cxx files. Please see what files to donwload [https://code.google.com/p/php-logger-extension/source/browse/trunk/log4cxx_modified_files/list_of_modified_files.TXT here].
   # Build log4cxx lib. This can be done using autotools, just follow the instructions at http://logging.apache.org/log4cxx/building/autotools.html.
   # Extract the php source file to someplace in you disk. Here we assume that the files are extracted to /tmp/php-5.2.10
 {{{
