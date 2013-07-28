@@ -224,12 +224,17 @@ https://code.google.com/p/php-logger-extension/
 
 - [OK] mudar para compilar com --with-logger=[path to log4cxx lib, includes] para remover o apontamento absoluto de dentro do fonte
 
-- adicionar suporte para configurar uma unica vez no MINIT atraves do logger.properties no php.ini
+- [OK] adicionar suporte para configurar uma unica vez no MINIT atraves do logger.properties no php.ini
 
 - [OK] compilar no windows com o php 5.3
-- compilar no linux com o php 5.3
 
-- compilar no windows com o php 5.4
+- compilar no linux com 5.2, 5.3, 5.4 e 5.5 apenas para verificar se compila com sucesso
+
+- compilar no windows com 5.2, 5.3, 5.4 e 5.5 adicionar as dlls para download
+	* 5.4 [OK]
+	* 5.3 falta adicionar suporte ao MINIT
+
+- [OK] compilar no windows com o php 5.4
 	* Download 5.4 dep back  http://windows.php.net/downloads/php-sdk/
 > setenv /x86 /xp /release
 > c:\php-sdk-54\bin\phpsdk_setvars.bat
@@ -242,15 +247,19 @@ https://code.google.com/p/php-logger-extension/
 	 * at MDC::remove(key) logger.cpp ln 614 (LoggerMDC::put)
 	 * apos varias tentativas de entender o problema, reinicie o note e o problema nao ocorreu, parece ser um erro do windows no load de alguma dll
 
+>configure --disable-all --with-php-build=c:\php-sdk-54 --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
+
 - compilar no linux com o php 5.4
 
 - adicionar suporte para configurar com XML, e tambem para configurar com XML via php.ini
 
 - gerar documentacao decente sobre como compilar no windows
 
-- criar repositorio no git hub, manter os dois repositorios google code e git atualizados
-
 - adicionar constantes para os niveis do log, por exemplo, Logger::DEBUG
 
 - rodar um teste de carga no linux com o apache usando mpm_fork, verificar se o logger gera io contention
-- verificar se eh possivel usar assynchronous  logging with mpm_fork
+
+- verificar se eh possivel usar assynchronous logging with mpm_fork
+
+- Adicionar suporte para logar objetos e arrays
+- Adicionar suporte para
