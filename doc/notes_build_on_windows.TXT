@@ -232,7 +232,15 @@ https://code.google.com/p/php-logger-extension/
 
 - compilar no windows com 5.2, 5.3, 5.4 e 5.5 adicionar as dlls para download
 	* 5.4 [OK]
-	* 5.3 falta adicionar suporte ao MINIT
+	* 5.3 [OK]
+
+- adicionar o numero da versao no logger_info table
+
+- compilar no windows com o php 5.3
+> setenv /x86 /xp /release
+> c:\php-sdk-53\bin\phpsdk_setvars.bat
+> cd C:\php-sdk-53\php53dev\vc9\x86\php5.3-201305231030
+> configure --disable-all --enable-debug --with-php-build=c:\php-sdk-54 --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
 
 - [OK] compilar no windows com o php 5.4
 	* Download 5.4 dep back  http://windows.php.net/downloads/php-sdk/
@@ -247,7 +255,7 @@ https://code.google.com/p/php-logger-extension/
 	 * at MDC::remove(key) logger.cpp ln 614 (LoggerMDC::put)
 	 * apos varias tentativas de entender o problema, reinicie o note e o problema nao ocorreu, parece ser um erro do windows no load de alguma dll
 
->configure --disable-all --with-php-build=c:\php-sdk-54 --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
+> configure --disable-all --with-php-build=c:\php-sdk-54 --enable-cli --enable-apache2-2handler --with-logger=shared,c:\apache-sdk\apache-log4cxx-0.10.0
 
 - compilar no linux com o php 5.4
 
