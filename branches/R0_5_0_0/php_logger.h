@@ -21,7 +21,7 @@
 #ifndef PHP_LOGGER_H
 #define PHP_LOGGER_H
 
-#define PHP_LOGGER_VERSION "0.10"
+#define PHP_LOGGER_VERSION "0.5"
 #define PHP_LOGGER_EXTNAME "logger"
 
 BEGIN_EXTERN_C()
@@ -46,7 +46,7 @@ PHP_RSHUTDOWN_FUNCTION(logger);
 PHP_MINFO_FUNCTION(logger);
 
 ZEND_BEGIN_MODULE_GLOBALS(logger)
-	char *configuration;
+	char *logger_ini_properties;
 ZEND_END_MODULE_GLOBALS(logger)
 
 #ifdef ZTS

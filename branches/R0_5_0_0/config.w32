@@ -4,14 +4,17 @@
 ARG_WITH("logger", "Apache log4cxx support", "no");
 
 if (PHP_LOGGER != "no") {
-	logger_lib_path = PHP_LOGGER + "\\projects\\Release;";
+	PHP_LOGGER_LIB_OK = CHECK_LIB("log4cxx.lib", "logger", PHP_LOGGER + "\\projects\\Debug;");
+	if (!PHP_LOGGER_LIB_OK) {
+		PHP_LOGGER_LIB_OK = CHECK_LIB("log4cxx.lib", "logger", PHP_LOGGER + "\\projects\\Release;");
+	}
+
 	logger_inc_path = PHP_LOGGER + "\\src\\main\\include;";
 
-
-	if (CHECK_LIB("log4cxx.lib;log4cxx.obj", "logger", logger_lib_path) &&
-	    CHECK_HEADER_ADD_INCLUDE("log4cxx\\logger.h", "CFLAGS_LOGGER", logger_inc_path)) {
-				EXTENSION("logger", "logger.cpp"); // PHP_LOGGER_SHARED
-				AC_DEFINE("HAVE_LOGGER", 1, "Apache log4cxx support");
+	if (PHP_LOGGER_LIB_OK
+	    && CHECK_HEADER_ADD_INCLUDE("log4cxx\\logger.h", "CFLAGS_LOGGER", logger_inc_path)) {
+		EXTENSION("logger", "logger.cpp"); // PHP_LOGGER_SHARED
+		AC_DEFINE("HAVE_LOGGER", 1, "Apache log4cxx support");
 	} else {
 		WARNING("logger not enabled; libraries and headers not found");
 	}
