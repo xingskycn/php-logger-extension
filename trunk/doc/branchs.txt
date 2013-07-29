@@ -1,0 +1,4 @@
+\branches
+	\R0001    - inactive
+	\R0_5_0_0 - version 0.5 supporting php 5.3
+\trunk      - version 1.0 supporting php 5.4
