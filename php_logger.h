@@ -21,7 +21,7 @@
 #ifndef PHP_LOGGER_H
 #define PHP_LOGGER_H
 
-#define PHP_LOGGER_VERSION "0.6"
+#define PHP_LOGGER_VERSION "1.0"
 #define PHP_LOGGER_EXTNAME "logger"
 
 BEGIN_EXTERN_C()
