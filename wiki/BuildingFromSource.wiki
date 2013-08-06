@@ -29,7 +29,7 @@ Here are some instructions to build the extension from the source files. We have
   make
   make install
 }}}
-  # If everything is fine you have php_logger.so installed. Now you need to change your php.ini to load the extension, just add extension=php_logger.so to the list of load extensions.
+  # If everything is fine you have php_logger.so installed. Now you need to change your php.ini to load the extension, just add extension=logger.so to the list of load extensions.
   # If you are starting to use the extension check the examples on how to configure the logger for use.
 
 == Building on Windows Xp ==
