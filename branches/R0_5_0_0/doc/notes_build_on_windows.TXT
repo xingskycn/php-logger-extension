@@ -226,3 +226,64 @@ https://code.google.com/p/php-logger-extension/
 - criar repositorio no git hub, manter os dois repositorios google code e git atualizados
 
 - adicionar constantes para os niveis do log, por exemplo, Logger::DEBUG
+
+
+=== Compilando a extensão php_excel ===
+- iniciar o Microsoft Windows SDK 6.1 Shell
+	> setenv /x86 /xp /release
+- mudar para o diretorio do php
+	> cd c:\php-sdk-53\php53dev\vc9\x86\php5.3-201305231030
+  > nmake clean
+  > buildconf
+  > configure --disable-all --with-php-build=c:\php-sdk-53 --enable-cli --enable-apache2-2handler --with-excel
+
+* Erro: Unknown option --with-libxl-incdir; please try configure.js --help for a list of valid options
+*       Percebi que os --with não são os mesmos para linux e windows
+*       No windows existe apenas uma conifiguração --with-excel
+*       O código da extensão espera que o .h e o .lib estjam nos diretórios padrão do php para windows
+*       Os caras dissecam as libs e juntam todos os .h e os .lib nas mesmas pastas
+*       copiei o conteudo de downloads\libxl-3.5.4.1\include_c para C:\php-sdk-53\include\libxl
+*       copiei o arquivo downloads\libxl-3.5.4.1\lib\libxl.lib para c:\php-sdk-53\lib\
+* configurou:
+> Checking for library libxl.lib ... ..\..\..\..\lib\libxl.lib
+> Checking for libxl.h ...  c:\php-sdk-53\include\libxl
+> Enabling extension ext\php_excel
+
+	> nmake
+* Erro: ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_PNG' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(69) : see declaration of 'PICTURETYPE_PNG'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_PNG' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_PNG'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_JPEG' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(69) : see declaration of 'PICTURETYPE_JPEG'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_JPEG' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_JPEG'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_WMF' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(69) : see declaration of 'PICTURETYPE_WMF'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_WMF' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_WMF'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_DIB' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(69) : see declaration of 'PICTURETYPE_DIB'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_DIB' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_DIB'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_EMF' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(69) : see declaration of 'PICTURETYPE_EMF'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_EMF' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_EMF'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_PICT' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(70) : see declaration of 'PICTURETYPE_PICT'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_PICT' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_PICT'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_TIFF' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(70) : see declaration of 'PICTURETYPE_TIFF'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_TIFF' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_TIFF'
+        ext\php_excel\excel.c(57) : error C2365: 'PICTURETYPE_ERROR' : redefinition; previous definition was 'enumerator' c:\php-sdk-53\include\libxl\enum.h(70) : see declaration of 'PICTURETYPE_ERROR'
+        ext\php_excel\excel.c(57) : error C2086: 'libXLPictureType PICTURETYPE_ERROR' : redefinition
+        ext\php_excel\excel.c(57) : see declaration of 'PICTURETYPE_ERROR'
+        ext\php_excel\excel.c(3436) : error C2198: 'xlSheetSetNamedRangeA' : too few arguments for call
+        ext\php_excel\excel.c(3460) : error C2198: 'xlSheetDelNamedRangeA' : too few arguments for call
+        ext\php_excel\excel.c(3625) : error C2198: 'xlSheetGetNamedRangeA' : too few arguments for call
+        ext\php_excel\excel.c(3650) : error C2198: 'xlSheetNamedRangeA' : too few arguments for call
+* Baixei o código do trunk
+* https://github.com/iliaal/php_excel
+* codigo do php_excel-master deployado
+*   > nmake
+*   > excel.c *nenhum erro*
+
+- Compilando com NTS para usar como fast-cgi no zend server
+
+> configure --disable-all --disable-zts --with-php-build=c:\php-sdk-53 --enable-cli --with-excel=shared
